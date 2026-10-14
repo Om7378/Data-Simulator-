@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Data Simulator</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b1120;
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 60px auto;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            color: #ffffff;
+            font-size: 20px;
+            margin-bottom: 18px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .option-card {
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 14px;
+            padding: 28px;
+            text-decoration: none;
+            color: inherit;
+            transition: 0.2s;
+        }
+
+        .option-card:hover {
+            border-color: #334155;
+            transform: translateY(-2px);
+        }
+
+        .option-icon {
+            font-size: 30px;
+            margin-bottom: 18px;
+        }
+
+        .option-card h2 {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .option-card p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 700px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Data Simulator</h1>
+
+    <p class="subtitle">
+        Select an option to continue
+    </p>
+
+    <h2 class="section-title">
+        Options
+    </h2>
+
+    <div class="options">
+
+<div class="option-card">
+
+    <div class="option-icon">
+        📊
+    </div>
+
+    <h2>Simulation</h2>
+
+    <p>
+        Select the type of simulation you want to run.
+    </p>
+
+    <select id="simulationType">
+        <option value="">Select Simulator</option>
+        <option value="temperature">Temperature</option>
+        <option value="vibration">Vibration</option>
+    </select>
+
+    <button onclick="openSimulator()">
+        OK
+    </button>
+
+</div>
+
+
+        <a href="/datasimulator/settings/" class="option-card">
+
+            <div class="option-icon">
+                ⚙
+            </div>
+
+            <h2>Settings</h2>
+
+            <p>
+                Configure PostgreSQL, MQTT and other data output adapters.
+            </p>
+
+        </a>
+
+    </div>
+
+</div>
+
+<script>
+    function openSimulator() {
+
+        const simulator = document.getElementById("simulationType").value;
+
+        if (simulator === "temperature") {
+            window.location.href = "/temperature/";
+        }
+
+        else if (simulator === "vibration") {
+        window.location.href = "/datasimulator/vibration/";
+        }
+
+        else {
+            alert("Please select a simulator.");
+        }
+    }
+</script>
+
+</body>
+</html>

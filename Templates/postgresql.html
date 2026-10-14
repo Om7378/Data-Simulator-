@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PostgreSQL Adapter - Data Simulator</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b1120;
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 40px auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .back-button {
+            text-decoration: none;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .back-button:hover {
+            color: #ffffff;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-top: 7px;
+            font-size: 14px;
+        }
+
+        .card {
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #ffffff;
+            font-size: 19px;
+            margin-bottom: 7px;
+        }
+
+        .card-description {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            color: #cbd5e1;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            background: #0b1120;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #64748b;
+        }
+
+        input::placeholder {
+            color: #475569;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 70px;
+        }
+
+        .show-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .test-button {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .test-button:hover {
+            background: #1d4ed8;
+        }
+
+        .save-button {
+            background: #1f2937;
+            color: #cbd5e1;
+            border: 1px solid #334155;
+        }
+
+        .save-button:hover {
+            background: #374151;
+        }
+
+        .mapping-note {
+            margin-top: 18px;
+            padding: 14px;
+            background: #0b1120;
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 700px) {
+
+            .container {
+                width: 94%;
+                margin: 25px auto;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: span 1;
+            }
+
+            .button-row {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    {% if error %}
+<div style="
+    background: #451a1a;
+    border: 1px solid #7f1d1d;
+    color: #fca5a5;
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+">
+    {{ error }}
+</div>
+{% endif %}
+
+{% if saved %}
+<div style="
+    background: #14532d;
+    border: 1px solid #166534;
+    color: #bbf7d0;
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+">
+    PostgreSQL configuration saved successfully.
+</div>
+{% endif %}
+
+
+    <!-- Header -->
+
+    <div class="header">
+
+        <a href="/datasimulator/settings/" class="back-button">
+            ← Back
+        </a>
+
+        <div>
+            <h1>PostgreSQL Adapter</h1>
+
+            <p class="subtitle">
+                Configure the PostgreSQL destination for simulated data
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- Connection -->
+<form method="POST" action="/temperature/save-postgresql/">
+    {% csrf_token %}
+
+    <div class="card">
+
+        <h2>Database Connection</h2>
+
+        <p class="card-description">
+            Enter the connection details for the existing PostgreSQL database.
+        </p>
+
+            <div class="form-group">
+
+        <label for="connection-name">
+            Connection Name
+        </label>
+
+        <input
+            type="text"
+            id="connection-name"
+            name="connection_name"
+            placeholder="e.g. 123"
+            required
+        >
+
+    </div>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label for="host">
+                    Host
+                </label>
+
+                <input
+                type="text"
+                id="host"
+                name="host"
+                placeholder="e.g. 10.1.3.120"
+>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="port">
+                    Port
+                </label>
+
+                <input
+                    type="number"
+                    id="port"
+                    name="port"
+                    placeholder="e.g. 5432"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="database">
+                    Database Name
+                </label>
+
+                <input
+                    type="text"
+                    id="database"
+                    name="database_name"
+                    placeholder="Database name"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="username">
+                    Username
+                </label>
+
+                <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Database username"
+         >
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <div class="password-wrapper">
+
+                    <input
+    type="password"
+    id="password"
+    name="password"
+    placeholder="Database password"
+>
+
+                    <button
+                        type="button"
+                        class="show-password"
+                        onclick="togglePassword()"
+                    >
+                        Show
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+<!-- Data Mapping -->
+
+<div class="card">
+
+    <h2>Data Mapping</h2>
+
+    <p class="card-description">
+        Select the simulator output and define how it should be stored in PostgreSQL.
+    </p>
+
+    <div class="form-grid">
+
+        <!-- Output Type -->
+
+        <div class="form-group full-width">
+
+            <label for="output-type">
+                Output Type
+            </label>
+
+            <select id="output-type" name="output_type">
+
+                <option value="temperature">
+                    Temperature
+                </option>
+
+                <option value="vibration">
+                    Vibration
+                </option>
+
+            </select>
+
+        </div>
+
+                <!-- Target Table -->
+
+        <div class="form-group full-width">
+
+            <label for="table">
+                Target Table
+            </label>
+
+            <input
+                type="text"
+                id="table"
+                name="target_table"
+                placeholder="e.g. temp_sezopf2t2_om"
+                required
+            >
+
+        </div>
+
+<!-- Output Column Mapping -->
+
+<div class="form-group full-width">
+
+    <div id="temperature-mapping">
+
+        <label for="temperature-column">
+            Temperature Column
+        </label>
+
+        <input
+            type="text"
+            id="temperature-column"
+            name="temperature_column"
+            placeholder="e.g. u1"
+            required
+        >
+
+    </div>
+
+
+    <div id="vibration-mapping" style="display: none;">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label for="velocity-column">
+                    Velocity Column
+                </label>
+
+                <input
+                    type="text"
+                    id="velocity-column"
+                    name="velocity_column"
+                    placeholder="e.g. u1"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="acceleration-column">
+                    Acceleration Column
+                </label>
+
+                <input
+                    type="text"
+                    id="acceleration-column"
+                    name="acceleration_column"
+                    placeholder="e.g. u2"
+                >
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+        <!-- Timestamp Column -->
+
+        <div class="form-group full-width">
+
+            <label for="timestamp-column">
+                Timestamp Column
+            </label>
+
+            <input
+                type="text"
+                id="timestamp-column"
+                name="timestamp_column"
+                placeholder="e.g. timestamp"
+                required
+            >
+
+        </div>
+    </div>
+
+
+    <div class="button-row">
+
+        <button
+            type="button"
+            class="test-button"
+            onclick="testPostgreSQLConnection()"
+        >
+            Test Connection
+        </button>
+
+        <button
+            type="submit"
+            class="save-button"
+        >
+            Save Configuration
+        </button>
+
+    </div>
+
+</div>
+
+</form>
+
+<script>
+
+function togglePassword() {
+
+    const password =
+        document.getElementById('password');
+
+    const button =
+        document.querySelector('.show-password');
+
+
+    if (password.type === 'password') {
+
+        password.type = 'text';
+        button.innerText = 'Hide';
+
+    } else {
+
+        password.type = 'password';
+        button.innerText = 'Show';
+
+    }
+
+}
+
+</script>
+<script>
+function testPostgreSQLConnection() {
+    const form = document.querySelector('form');
+
+    const formData = new FormData(form);
+
+    fetch('/temperature/test-postgresql/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+    })
+    .catch(error => {
+        alert('Connection test failed.');
+        console.error(error);
+    });
+}
+</script>
+
+
+<script>
+
+const outputType = document.getElementById("output-type");
+
+const temperatureMapping =
+    document.getElementById("temperature-mapping");
+
+const vibrationMapping =
+    document.getElementById("vibration-mapping");
+
+const temperatureColumn =
+    document.getElementById("temperature-column");
+
+const velocityColumn =
+    document.getElementById("velocity-column");
+
+const accelerationColumn =
+    document.getElementById("acceleration-column");
+
+
+outputType.addEventListener("change", function () {
+
+    if (this.value === "temperature") {
+
+        temperatureMapping.style.display = "block";
+        vibrationMapping.style.display = "none";
+
+        temperatureColumn.required = true;
+        velocityColumn.required = false;
+        accelerationColumn.required = false;
+
+    }
+
+    else if (this.value === "vibration") {
+
+        temperatureMapping.style.display = "none";
+        vibrationMapping.style.display = "block";
+
+        temperatureColumn.required = false;
+        velocityColumn.required = true;
+        accelerationColumn.required = true;
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
